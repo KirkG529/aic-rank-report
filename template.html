@@ -333,7 +333,17 @@ footer a{color:var(--acc);text-decoration:none}
     var only = document.getElementById('onlymove').checked;
     var rows = D.teams.slice();
     if(q) rows = rows.filter(function(t){ return (t.team+' '+t.csbh).toLowerCase().indexOf(q)>=0; });
-    if(only) rows = rows.filter(function(t){ return t.rank_delta!==0 || t.score_delta!==null; });
+    if(only){
+      if(!D.has_prev){
+        rows = [];                       // 只有一个快照时无变化可言
+      } else {
+        rows = rows.filter(function(t){
+          var scoreMoved = (t.score_delta !== null && Math.abs(t.score_delta) > 0.00005);
+          var rankMoved  = (t.rank_delta === null || t.rank_delta !== 0);  // null = 本轮新进榜
+          return rankMoved || scoreMoved;
+        });
+      }
+    }
     rows.sort(function(a,b){
       if(sortKey==='rank') return a.rank-b.rank;
       if(sortKey==='rank_delta'){
@@ -360,7 +370,11 @@ footer a{color:var(--acc);text-decoration:none}
         '<td class="mono">'+esc(t.scored_at)+'</td>'+
         '<td>'+spark(t)+'</td></tr>';
     }).join('');
-    document.getElementById('tbl-empty').style.display = rows.length? 'none':'block';
+    var emptyEl = document.getElementById('tbl-empty');
+    emptyEl.style.display = rows.length? 'none':'block';
+    emptyEl.textContent = only
+      ? (D.has_prev ? '本轮没有名次或分数变化' : '还没有可对比的历史快照（至少需要 2 个整点快照）')
+      : '没有匹配的队伍';
     Array.prototype.forEach.call(document.querySelectorAll('#tbody tr'), function(tr){
       tr.addEventListener('click', function(){ toggle(tr.getAttribute('data-csbh')); });
     });
