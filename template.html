@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AIC 复赛排名实时报表</title>
+<style>
+:root{
+  --bg:#0b1020; --bg2:#121a33; --card:#161f3d; --card2:#1c2749;
+  --line:#26325c; --tx:#e8edff; --tx2:#93a0c8; --tx3:#65719b;
+  --up:#2dd4a7; --down:#ff6b81; --new:#ffd166; --acc:#4cc9f0;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:radial-gradient(1200px 600px at 20% -10%,#1b2a5a 0%,transparent 60%),
+             radial-gradient(900px 500px at 100% 0%,#2a1b4a 0%,transparent 55%),
+             var(--bg);
+  color:var(--tx);
+  font:14px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;
+  padding:18px 14px 60px;
+}
+.wrap{max-width:1120px;margin:0 auto}
+/* ---------- header ---------- */
+header{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:44px;height:44px;border-radius:13px;flex:0 0 auto;display:grid;place-items:center;
+  background:linear-gradient(135deg,#4cc9f0,#7b61ff);color:#08101f;font-weight:800;font-size:15px;letter-spacing:.5px}
+h1{font-size:19px;margin:0;letter-spacing:.3px}
+.sub{margin:2px 0 0;color:var(--tx2);font-size:12.5px}
+.meta{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:#141d3a;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12px;color:var(--tx2)}
+.pill b{color:var(--tx);font-weight:600}
+/* ---------- cards ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin-bottom:16px}
+.card{background:linear-gradient(160deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:16px;padding:13px 14px}
+.card .k{font-size:11.5px;color:var(--tx3);letter-spacing:.4px}
+.card .v{font-size:22px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
+.card .s{font-size:12px;color:var(--tx2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.up{color:var(--up)} .down{color:var(--down)} .warn{color:var(--new)}
+/* ---------- panel ---------- */
+.panel{background:rgba(18,26,51,.72);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:16px;backdrop-filter:blur(6px)}
+.panel-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.panel-head h2{font-size:15px;margin:0;font-weight:600}
+.hint{color:var(--tx3);font-size:11.5px;max-width:520px;text-align:right}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input[type=text],select{background:#101a35;border:1px solid var(--line);color:var(--tx);border-radius:10px;padding:7px 10px;font-size:13px;outline:none}
+input[type=text]{min-width:170px}
+input[type=text]:focus,select:focus{border-color:var(--acc)}
+.chk{display:inline-flex;gap:6px;align-items:center;color:var(--tx2);font-size:12.5px;user-select:none}
+/* ---------- chart ---------- */
+.chart-wrap{position:relative;overflow-x:auto}
+#chart{width:100%;height:auto;display:block;touch-action:pan-y}
+.legend{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.chip{display:inline-flex;gap:7px;align-items:center;background:#101a35;border:1px solid var(--line);
+  border-radius:999px;padding:5px 11px;font-size:12px;cursor:pointer;max-width:100%}
+.chip .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.chip .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px}
+.chip .rk{color:var(--tx3);font-variant-numeric:tabular-nums}
+.chip.on{border-color:var(--acc);background:#132347}
+/* ---------- table ---------- */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:13px;min-width:760px}
+th,td{padding:9px 10px;text-align:left;white-space:nowrap;font-variant-numeric:tabular-nums}
+thead th{position:sticky;top:0;background:#111a36;color:var(--tx2);font-weight:600;font-size:12px;border-bottom:1px solid var(--line);z-index:2}
+tbody tr{border-bottom:1px solid rgba(38,50,92,.55);cursor:pointer}
+tbody tr:hover{background:#16204a}
+tbody tr.sel{background:#152a52}
+td.rank{font-weight:700}
+td.team{max-width:230px;overflow:hidden;text-overflow:ellipsis}
+td.num{text-align:right}
+.badge{display:inline-block;min-width:44px;text-align:center;border-radius:7px;padding:1px 6px;font-size:11.5px;font-weight:600}
+.badge.u{background:rgba(45,212,167,.14);color:var(--up)}
+.badge.d{background:rgba(255,107,129,.14);color:var(--down)}
+.badge.n{background:rgba(255,209,102,.16);color:var(--new)}
+.badge.z{color:var(--tx3);background:rgba(101,113,155,.12)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--tx2)}
+/* ---------- changes ---------- */
+.changes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.changes h2{grid-column:1/-1;font-size:15px;margin:0 0 2px}
+.clist{background:#101a35;border:1px solid var(--line);border-radius:14px;padding:11px 13px}
+.clist .ct{font-size:12px;color:var(--tx3);margin-bottom:7px;letter-spacing:.3px}
+.clist ul{list-style:none;margin:0;padding:0;font-size:12.5px}
+.clist li{display:flex;gap:8px;justify-content:space-between;padding:3px 0;border-bottom:1px dashed rgba(38,50,92,.6)}
+.clist li:last-child{border-bottom:0}
+.clist li span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.empty{color:var(--tx3);font-size:12.5px;padding:10px 2px}
+footer{color:var(--tx3);font-size:11.5px;text-align:center;line-height:1.7}
+footer a{color:var(--acc);text-decoration:none}
+@media (max-width:560px){
+  h1{font-size:17px}
+  .card .v{font-size:19px}
+  .hint{text-align:left}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">AIC</div>
+      <div>
+        <h1 id="hd-title">复赛排名实时报表</h1>
+        <p class="sub" id="hd-sub">基于大模型的多模态视觉理解与推理 · 复赛</p>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="pill">数据更新 <b id="hd-time">—</b></div>
+      <div class="pill">快照 <b id="hd-count">0</b> 个</div>
+      <div class="pill">覆盖 <b id="hd-span">—</b></div>
+    </div>
+  </header>
+
+  <section class="cards" id="cards"></section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>名次走势（每小时一个点）</h2>
+      <div class="hint">点表格里的任意队伍 → 在图上叠加/移除它的名次曲线</div>
+    </div>
+    <div class="chart-wrap"><svg id="chart" viewBox="0 0 900 380" preserveAspectRatio="xMidYMid meet" role="img" aria-label="名次走势图"></svg></div>
+    <div class="legend" id="legend"></div>
+    <div class="empty" id="chart-empty" style="display:none"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>排名明细</h2>
+      <div class="tools">
+        <input type="text" id="q" placeholder="搜索队伍名 / 参赛编号" autocomplete="off">
+        <select id="sort">
+          <option value="rank">按排名</option>
+          <option value="rank_delta">按名次变动</option>
+          <option value="score_delta">按分数变动</option>
+          <option value="score">按分数</option>
+          <option value="submit">按提交时间</option>
+        </select>
+        <label class="chk"><input type="checkbox" id="onlymove"> 只看有变化</label>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>排名</th><th>变动</th><th>团队名称</th><th>参赛编号</th>
+          <th style="text-align:right">分数</th><th style="text-align:right">分数变动</th>
+          <th>提交时间</th><th>打分时间</th><th>走势</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="tbl-empty" style="display:none">没有匹配的队伍</div>
+  </section>
+
+  <section class="panel changes" id="changes"></section>
+
+  <footer id="foot"></footer>
+</div>
+
+<script id="report-data" type="application/json">__DATA__</script>
+<script>
+(function(){
+  "use strict";
+  var D = JSON.parse(document.getElementById('report-data').textContent);
+  var PALETTE = ['#4cc9f0','#ff6b81','#ffd166','#2dd4a7','#c77dff','#ff9f1c','#90be6d','#4dabf7','#f783ac','#ffe066'];
+  var selected = [];           // 选中队伍的 csbh
+  var colorOf = {};            // csbh -> color
+
+  function fmtScore(v){ return (v===null||v===undefined) ? '—' : Number(v).toFixed(4); }
+  function fmtDelta(v,digits){
+    if(v===null||v===undefined||v===0) return '—';
+    var s = (v>0?'+':'') + (digits? Number(v).toFixed(digits) : v);
+    return s;
+  }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  /* ---------------- header + cards ---------------- */
+  document.getElementById('hd-title').textContent = D.stage + '排名实时报表';
+  document.getElementById('hd-sub').textContent = D.title + ' · ' + D.stage;
+  document.getElementById('hd-time').textContent = D.generated_at;
+  document.getElementById('hd-count').textContent = D.hours.length;
+  document.getElementById('hd-span').textContent = D.hours.length>1
+      ? (D.hours[0].slice(5) + ' → ' + D.hours[D.hours.length-1].slice(5)) : '单点';
+
+  var st = D.stats;
+  var noneUp   = D.has_prev ? '本轮无人上升（对比上一整点）' : '暂无对比数据';
+  var noneDown = D.has_prev ? '本轮无人下降（对比上一整点）' : '暂无对比数据';
+  var noneSc   = D.has_prev ? '本轮无人提分（对比上一整点）' : '暂无对比数据';
+  var cards = [
+    {k:'参赛队伍', v: st.total, s: D.stage + ' 榜单共 ' + st.total + ' 支'},
+    {k:'上升最多', v: st.topUp? ('▲'+st.topUp.rank_delta) : '—', cls:'up',
+     s: st.topUp? (st.topUp.team+'（'+st.topUp.prev_rank+' → '+st.topUp.rank+'）') : noneUp},
+    {k:'下降最多', v: st.topDown? ('▼'+Math.abs(st.topDown.rank_delta)) : '—', cls:'down',
+     s: st.topDown? (st.topDown.team+'（'+st.topDown.prev_rank+' → '+st.topDown.rank+'）') : noneDown},
+    {k:'分数提升最多', v: st.topScore? ('+'+st.topScore.score_delta.toFixed(4)) : '—', cls:'up',
+     s: st.topScore? (st.topScore.team+' → '+fmtScore(st.topScore.score)) : noneSc},
+    {k:'名次变动队伍', v: st.moved, s:'相比上一整点发生移动的队伍数'},
+    {k:'最高分', v: st.leader? fmtScore(st.leader.score) : '—', cls:'warn',
+     s: st.leader? (st.leader.team + '（排名 1）') : '—'}
+  ];
+  document.getElementById('cards').innerHTML = cards.map(function(c){
+    return '<div class="card"><div class="k">'+esc(c.k)+'</div><div class="v '+(c.cls||'')+'">'+esc(c.v)+
+           '</div><div class="s">'+esc(c.s)+'</div></div>';
+  }).join('');
+
+  /* ---------------- 选中/配色 ---------------- */
+  function ensureColor(csbh){
+    var used = Object.keys(colorOf).map(function(k){return colorOf[k];});
+    var free = PALETTE.filter(function(c){return used.indexOf(c)<0;});
+    colorOf[csbh] = (free.length? free[0] : PALETTE[used.length % PALETTE.length]);
+    return colorOf[csbh];
+  }
+  function toggle(csbh){
+    var i = selected.indexOf(csbh);
+    if(i>=0){ selected.splice(i,1); } else { selected.push(csbh); ensureColor(csbh); }
+    renderChart(); renderTable();
+  }
+
+  /* ---------------- 走势 SVG ---------------- */
+  var H = 380, W = 900, PAD = {l:46,r:16,t:16,b:44};
+  function renderChart(){
+    var svg = document.getElementById('chart');
+    var empty = document.getElementById('chart-empty');
+    var teams = D.teams.filter(function(t){ return selected.indexOf(t.csbh)>=0; });
+    var hours = D.hours;
+    if(hours.length < 2){
+      svg.innerHTML='';
+      svg.style.display='none';
+      empty.style.display='block';
+      empty.textContent = '历史快照不足 2 个（当前仅 '+hours.length+' 个，通常是刚部署）。每整点自动抓取一次，累积后这里会画出名次曲线。';
+      renderLegend(teams);
+      return;
+    }
+    svg.style.display='block';
+    empty.style.display='none';
+    var n = hours.length;
+    var maxRank = 1;
+    teams.forEach(function(t){ t.series.forEach(function(p){ if(p[1]>maxRank) maxRank=p[1]; }); });
+    if(teams.length===0){ maxRank = D.stats.total || 10; }
+    maxRank = Math.max(2, Math.min(maxRank, D.stats.total));
+    var iw = W-PAD.l-PAD.r, ih = H-PAD.t-PAD.b;
+    function X(i){ return PAD.l + (n===1? iw/2 : iw*i/(n-1)); }
+    function Y(r){ return PAD.t + ih*(r-1)/Math.max(1,(maxRank-1)); }
+    var parts = [];
+    // 网格 + y 轴
+    var ticks = niceTicks(maxRank, 6);
+    ticks.forEach(function(r){
+      var y = Y(r);
+      parts.push('<line x1="'+PAD.l+'" y1="'+y.toFixed(1)+'" x2="'+(W-PAD.r)+'" y2="'+y.toFixed(1)+
+                 '" stroke="rgba(38,50,92,'+(r===1?0.95:0.5)+')" stroke-width="1"'+(r===1?'':' stroke-dasharray="3 4"')+'/>');
+      parts.push('<text x="'+(PAD.l-8)+'" y="'+(y+4).toFixed(1)+'" fill="#65719b" font-size="11" text-anchor="end">'+r+'</text>');
+    });
+    parts.push('<text x="'+(PAD.l-34)+'" y="'+(PAD.t+ih/2)+'" fill="#65719b" font-size="11" text-anchor="middle" transform="rotate(-90 '+(PAD.l-34)+' '+(PAD.t+ih/2)+')">名次（上=更靠前）</text>');
+    // x 轴
+    var step = Math.max(1, Math.ceil(n/8));
+    for(var i=0;i<n;i++){
+      var x = X(i);
+      parts.push('<line x1="'+x.toFixed(1)+'" y1="'+PAD.t+'" x2="'+x.toFixed(1)+'" y2="'+(H-PAD.b)+'" stroke="rgba(38,50,92,0.28)"/>');
+      if(i%step===0 || i===n-1){
+        var anchor = (i===n-1 && i!==0) ? 'end' : (i===0 ? 'start' : 'middle');
+        var tx = (i===n-1 && i!==0) ? x+22 : (i===0 ? x-4 : x);
+        parts.push('<text x="'+tx.toFixed(1)+'" y="'+(H-PAD.b+18)+'" fill="#65719b" font-size="10.5" text-anchor="'+anchor+'">'+esc(hours[i].slice(5))+'</text>');
+      }
+    }
+    // 曲线
+    teams.forEach(function(t){
+      var c = colorOf[t.csbh] || PALETTE[0];
+      var d = '', lastY = null;
+      t.series.forEach(function(p){
+        var x = X(p[0]), y = Y(p[1]);
+        d += (d? ' L':'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+        lastY = y;
+      });
+      parts.push('<path d="'+d+'" fill="none" stroke="'+c+'" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>');
+      t.series.forEach(function(p){
+        var x = X(p[0]), y = Y(p[1]);
+        parts.push('<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(p[0]===t.series[t.series.length-1][0]?3.6:2.4)+'" fill="'+c+'">'+
+                   '<title>'+esc(t.team)+' · '+esc(hours[p[0]])+' · 第'+p[1]+'名 · '+fmtScore(p[2])+'</title></circle>');
+      });
+      var lp = t.series[t.series.length-1];
+      if(lp){
+        // 末端只标名次号码，避免长队名被右边界裁掉（队名看下方图例）
+        var lx = Math.min(X(lp[0])+7, W-PAD.r+6), ly = Math.max(PAD.t+9, Y(lp[1])-6);
+        parts.push('<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" fill="'+c+'" font-size="11" font-weight="600">#'+lp[1]+'</text>');
+      }
+    });
+    svg.innerHTML = parts.join('');
+    renderLegend(teams);
+  }
+  function niceTicks(max, count){
+    var out=[], raw = Math.max(1,(max-1))/count, p=1;
+    while(raw>10){ raw/=10; p*=10; }
+    var step = Math.max(1, Math.ceil(raw)*p);
+    for(var r=1;r<=max;r+=step) out.push(r);
+    if(out[out.length-1]!==max && out.length>1) out.push(max);
+    return out;
+  }
+  function renderLegend(teams){
+    var el = document.getElementById('legend');
+    el.innerHTML = teams.map(function(t){
+      var c = colorOf[t.csbh] || PALETTE[0];
+      return '<span class="chip on" data-csbh="'+esc(t.csbh)+'"><span class="dot" style="background:'+c+'"></span>'+
+             '<span class="nm">'+esc(t.team)+'</span><span class="rk">#'+t.rank+'</span></span>';
+    }).join('');
+    Array.prototype.forEach.call(el.querySelectorAll('.chip'), function(ch){
+      ch.addEventListener('click', function(){ toggle(ch.getAttribute('data-csbh')); });
+    });
+  }
+
+  /* ---------------- 明细表 ---------------- */
+  function spark(t){
+    if(t.series.length<2) return '<span class="mono">—</span>';
+    var w=86,h=22, rs=t.series.map(function(p){return p[1];});
+    var mn=Math.min.apply(null,rs), mx=Math.max.apply(null,rs), sp=Math.max(1,mx-mn);
+    var d = t.series.map(function(p,i){
+      var x = (w-6)*i/(t.series.length-1)+3;
+      var y = 3 + (h-6)*(p[1]-mn)/sp;
+      return (i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);
+    }).join(' ');
+    var c = colorOf[t.csbh] || '#4cc9f0';
+    return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'"><path d="'+d+'" fill="none" stroke="'+c+'" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+  }
+  function badge(t){
+    if(!D.has_prev) return '<span class="badge z">–</span>';
+    if(t.rank_delta===null) return '<span class="badge n">NEW</span>';
+    if(t.rank_delta>0) return '<span class="badge u">▲'+t.rank_delta+'</span>';
+    if(t.rank_delta<0) return '<span class="badge d">▼'+Math.abs(t.rank_delta)+'</span>';
+    return '<span class="badge z">–</span>';
+  }
+  function renderTable(){
+    var q = document.getElementById('q').value.trim().toLowerCase();
+    var sortKey = document.getElementById('sort').value;
+    var only = document.getElementById('onlymove').checked;
+    var rows = D.teams.slice();
+    if(q) rows = rows.filter(function(t){ return (t.team+' '+t.csbh).toLowerCase().indexOf(q)>=0; });
+    if(only) rows = rows.filter(function(t){ return t.rank_delta!==0 || t.score_delta!==null; });
+    rows.sort(function(a,b){
+      if(sortKey==='rank') return a.rank-b.rank;
+      if(sortKey==='rank_delta'){
+        var av = a.rank_delta===null? -999 : a.rank_delta, bv = b.rank_delta===null? -999 : b.rank_delta;
+        return bv-av;
+      }
+      if(sortKey==='score_delta') return (b.score_delta||0)-(a.score_delta||0);
+      if(sortKey==='score') return (b.score||0)-(a.score||0);
+      if(sortKey==='submit') return String(b.submit).localeCompare(String(a.submit));
+      return 0;
+    });
+    document.getElementById('tbody').innerHTML = rows.map(function(t){
+      var sel = selected.indexOf(t.csbh)>=0 ? ' class="sel"' : '';
+      var sd = (t.score_delta && Math.abs(t.score_delta)>0.00005)
+        ? '<span class="'+(t.score_delta>0?'up':'down')+'">'+fmtDelta(t.score_delta,4)+'</span>' : '<span style="color:#65719b">—</span>';
+      return '<tr data-csbh="'+esc(t.csbh)+'"'+sel+'>'+
+        '<td class="rank">'+t.rank+'</td>'+
+        '<td>'+badge(t)+'</td>'+
+        '<td class="team" title="'+esc(t.team)+'">'+esc(t.team)+'</td>'+
+        '<td class="mono">'+esc(t.csbh)+'</td>'+
+        '<td class="num">'+fmtScore(t.score)+'</td>'+
+        '<td class="num">'+sd+'</td>'+
+        '<td class="mono">'+esc(t.submit)+'</td>'+
+        '<td class="mono">'+esc(t.scored_at)+'</td>'+
+        '<td>'+spark(t)+'</td></tr>';
+    }).join('');
+    document.getElementById('tbl-empty').style.display = rows.length? 'none':'block';
+    Array.prototype.forEach.call(document.querySelectorAll('#tbody tr'), function(tr){
+      tr.addEventListener('click', function(){ toggle(tr.getAttribute('data-csbh')); });
+    });
+  }
+
+  /* ---------------- 本轮变动 ---------------- */
+  function renderChanges(){
+    if(!D.has_prev){
+      document.getElementById('changes').innerHTML =
+        '<h2>本轮变动（对比上一整点快照）</h2>'+
+        '<div class="clist" style="grid-column:1/-1"><div class="ct">等待第二个整点快照</div>'+
+        '<ul><li><span>当前只有 1 个快照，暂无可对比的历史数据。</span><span style="color:#4cc9f0">下一整点后自动出现</span></li></ul></div>';
+      return;
+    }
+    var up = D.teams.filter(function(t){return t.rank_delta>0;}).sort(function(a,b){return b.rank_delta-a.rank_delta;}).slice(0,8);
+    var dn = D.teams.filter(function(t){return t.rank_delta<0;}).sort(function(a,b){return a.rank_delta-b.rank_delta;}).slice(0,8);
+    var sc = D.teams.filter(function(t){return t.score_delta!==null && Math.abs(t.score_delta)>0.00005;})
+                    .sort(function(a,b){return b.score_delta-a.score_delta;}).slice(0,8);
+    var nw = D.teams.filter(function(t){return t.rank_delta===null;}).slice(0,8);
+    function block(title, list, fmt){
+      var li = list.map(function(t){
+        return '<li><span>'+esc(t.team)+'</span><span>'+fmt(t)+'</span></li>';
+      }).join('') || '<li><span style="color:#65719b">本轮暂无</span></li>';
+      return '<div class="clist"><div class="ct">'+title+'</div><ul>'+li+'</ul></div>';
+    }
+    document.getElementById('changes').innerHTML =
+      '<h2>本轮变动（对比上一整点快照）</h2>'+
+      block('名次上升', up, function(t){ return '<span class="up">▲'+t.rank_delta+' → 第'+t.rank+'名</span>'; })+
+      block('名次下降', dn, function(t){ return '<span class="down">▼'+Math.abs(t.rank_delta)+' → 第'+t.rank+'名</span>'; })+
+      block('分数变化', sc, function(t){ return '<span class="'+(t.score_delta>0?'up':'down')+'">'+fmtDelta(t.score_delta,4)+'</span>'; })+
+      block('新进榜 / 首次出现', nw, function(t){ return '<span class="warn">第'+t.rank+'名</span>'; });
+  }
+
+  document.getElementById('q').addEventListener('input', renderTable);
+  document.getElementById('sort').addEventListener('change', renderTable);
+  document.getElementById('onlymove').addEventListener('change', renderTable);
+
+  document.getElementById('foot').innerHTML =
+    '数据来源：<a href="'+esc(D.page_url)+'" target="_blank" rel="noopener">AIC 排行榜 · '+esc(D.stage)+'</a>'+
+    ' ｜ 采集方式：每整点自动抓取快照，对比生成报表 ｜ 本页生成于 '+esc(D.generated_at)+''+
+    (D.next_run? ' ｜ 下次自动抓取：'+esc(D.next_run) : '');
+
+  // 默认展示当前前 5 名曲线
+  D.teams.slice().sort(function(a,b){return a.rank-b.rank;}).slice(0,5).forEach(function(t){
+    selected.push(t.csbh); ensureColor(t.csbh);
+  });
+  renderChart(); renderTable(); renderChanges();
+})();
+</script>
+</body>
+</html>

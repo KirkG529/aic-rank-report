@@ -1,0 +1,78 @@
+name: 整点抓取复赛排名
+
+on:
+  schedule:
+    # 注意：这里是 UTC。北京时间(UTC+8) 的整点 = UTC 的整点，
+    # 用第 3 分钟避开整点高峰（GitHub 定时任务排队较挤，可能延后几分钟）
+    - cron: '3 * * * *'
+  workflow_dispatch:            # 支持在网页上手动触发
+
+permissions:
+  contents: write               # 允许把新快照/报表提交回仓库（Pages 从 main 分支发布）
+
+concurrency:
+  group: rank-hourly
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 准备 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 抓取排行榜快照
+        run: python3 collect.py --outdir .
+
+      - name: 生成 Web 报表
+        run: python3 report.py --outdir . --snapdir ./data/snapshots --out ./index.html
+
+      - name: 写入运行摘要
+        run: |
+          {
+            echo "### 复赛排名快照（北京时间 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')）"
+            echo
+            echo "| 排名 | 团队 | 分数 | 提交时间 |"
+            echo "| --- | --- | --- | --- |"
+            python3 - <<'PY'
+          import json
+          d = json.load(open("data/latest.json", encoding="utf-8"))
+          for st, rows in d.get("stages", {}).items():
+              print("| | **%s（共 %d 队）** | | |" % (st, len(rows)))
+              for r in rows[:10]:
+                  print("| %s | %s | %s | %s |" % (r["rank"], r["team"], r["score"], r["submit"]))
+          PY
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: 可选·同步到腾讯云 COS
+        continue-on-error: true
+        env:
+          COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
+          COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
+          COS_REGION: ${{ secrets.COS_REGION }}
+          COS_BUCKET: ${{ secrets.COS_BUCKET }}
+        run: |
+          if [ -z "$COS_SECRET_ID" ] || [ -z "$COS_BUCKET" ]; then
+            echo "未配置 COS 密钥，跳过"
+            exit 0
+          fi
+          python3 -m pip install --quiet cos-python-sdk-v5
+          python3 upload_cos.py
+
+      - name: 提交变更
+        run: |
+          git config user.name  "AIC Rank Bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "没有变化，跳过提交"
+            exit 0
+          fi
+          git commit -m "排名更新 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:00')"
+          git push

@@ -1,0 +1,19 @@
+{
+  "name": "AIC-算法挑战赛（赛马制）· 基于大模型的多模态视觉理解与推理",
+  "page_url": "https://reg.aicomp.cn/special/phb/detail?id=4863965159124766778&rwId=4829238709759119407&stbh=4829238709759119421",
+  "api": "https://jluat-smart-app-api.yuntu.cn/third/jsphb",
+  "type": "JSDF",
+  "rwId": "4829238709759119407",
+  "stbh": "4829238709759119421",
+  "stages": [
+    "复赛"
+  ],
+  "timeout": 30,
+  "retries": 3,
+  "page_size": 2000,
+  "outdir": "/var/minis/workspace/aicomp-rank",
+  "github": {
+    "repo": "KirkG529/aic-rank-report",
+    "branch": "main"
+  }
+}
