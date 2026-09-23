@@ -93,6 +93,10 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--test", action="store_true")
     ap.add_argument("--webhook", default=None)
+    ap.add_argument("--min-interval", type=int, default=30,
+                    help="普通变动的最短推送间隔（分钟），默认 30")
+    ap.add_argument("--notable-cooldown", type=int, default=5,
+                    help="重大变动（换榜首/前十名次大幅波动）的最短间隔（分钟），默认 5")
     args = ap.parse_args()
 
     cfg = json.load(open(os.path.join(HERE, "config.json"), encoding="utf-8"))
@@ -134,7 +138,41 @@ def main():
         except Exception:  # noqa: BLE001
             state = {}
     if state.get("hour") == hours[-1] and state.get("hash") == digest:
-        print("本小时（%s）已推送过相同变化，跳过" % hours[-1])
+        print("本次变化（%s）已推送过，跳过" % hours[-1])
+        return 0
+
+    # 节流策略：数据是实时更新的，不能每抓一次就推一次
+    #   · 重大变动（榜首易主 / 前十名次波动≥3）→ 至少间隔 notable_cooldown 分钟
+    #   · 普通变动 → 至少间隔 min_interval 分钟，做"节奏感"摘要推送
+    now = datetime.now(TZ)
+    last = None
+    if state.get("sent_at"):
+        try:
+            last = datetime.strptime(state["sent_at"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=TZ)
+        except Exception:  # noqa: BLE001
+            last = None
+
+    top10 = sorted(teams, key=lambda t: t["rank"] if t["rank"] is not None else 10 ** 9)[:10]
+    notable = []
+    if stats["topUp"] and stats["topUp"]["rank"] <= 10 and stats["topUp"]["rank_delta"] >= 3:
+        notable.append("%s 冲进前十（+%d）" % (stats["topUp"]["team"], stats["topUp"]["rank_delta"]))
+    for t in top10:
+        if t["rank_delta"] is None:
+            notable.append("%s 新进前十（第 %d）" % (t["team"], t["rank"]))
+        elif t["rank_delta"] <= -3:
+            notable.append("%s 跌出前 %d 名" % (t["team"], t["rank"]))
+    prev_leader = state.get("leader")
+    if prev_leader and stats["leader"] and prev_leader != stats["leader"]["team"]:
+        notable.append("榜首易主：%s → %s" % (prev_leader, stats["leader"]["team"]))
+
+    since = (now - last).total_seconds() / 60.0 if last else 1e9
+    if notable and since >= args.notable_cooldown:
+        print("重大变动，立即推送：%s" % "；".join(notable[:3]))
+    elif since >= args.min_interval:
+        print("距上次推送 %.0f 分钟，按摘要推送" % since)
+    else:
+        print("距上次推送仅 %.0f 分钟（普通变动需间隔 %d 分钟），暂不推送"
+              % (since, args.min_interval))
         return 0
 
     print("---- 消息预览 ----")
@@ -153,6 +191,7 @@ def main():
     if r.get("errcode") == 0:
         os.makedirs(os.path.dirname(state_path), exist_ok=True)
         json.dump({"hour": hours[-1], "hash": digest,
+                   "leader": stats["leader"]["team"] if stats["leader"] else None,
                    "sent_at": datetime.now(TZ).strftime("%Y-%m-%d %H:%M:%S")},
                   open(state_path, "w", encoding="utf-8"), ensure_ascii=False)
         return 0

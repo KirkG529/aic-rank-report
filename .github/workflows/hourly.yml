@@ -1,23 +1,24 @@
-name: 整点抓取复赛排名
+name: 排名实时抓取
 
 on:
   schedule:
-    # ⚠️ 这里是 UTC；北京时间 = UTC+8，整点对齐，所以同一分钟即北京的同一分钟。
-    # GitHub 官方说明：定时任务在「每小时开头」这类高峰期会被延迟，负载过高时甚至会被丢弃。
-    # 因此避开整点，安排两个错峰时间点做双保险（同一小时内重复跑只覆盖同一槽位，不会重复计数）。
-# 每小时 4 个错峰触发点：被延迟/丢弃时下面的点会补上；
-    # 同一小时内多次运行只覆盖该小时槽位，不会产生重复数据点。
-    - cron: '13 * * * *'
-    - cron: '28 * * * *'
-    - cron: '43 * * * *'
-    - cron: '58 * * * *'
+    # 注意：这里是 UTC；北京时间 = UTC+8，分钟一致。
+    # GitHub 官方说明：定时任务在「每小时开头」是高峰期，会被延迟、负载高时甚至被丢弃，
+    # 因此避开整点，采用 6 个错峰触发点（每 10 分钟一次）。
+    # 同一小时内的多次抓取只覆盖该小时的快照槽位，并追加进「变动流水」，不会重复计数。
+    - cron: '7 * * * *'
+    - cron: '17 * * * *'
+    - cron: '27 * * * *'
+    - cron: '37 * * * *'
+    - cron: '47 * * * *'
+    - cron: '57 * * * *'
   workflow_dispatch:            # 支持在网页上手动触发
 
 permissions:
   contents: write               # 允许把新快照/报表提交回仓库（Pages 从 main 分支发布）
 
 concurrency:
-  group: rank-hourly
+  group: rank-tick
   cancel-in-progress: false
 
 jobs:
@@ -92,5 +93,5 @@ jobs:
             echo "没有变化，跳过提交"
             exit 0
           fi
-          git commit -m "排名更新 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:00')"
+          git commit -m "排名更新 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
           git push

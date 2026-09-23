@@ -85,6 +85,12 @@ td.num{text-align:right}
 .clist li:last-child{border-bottom:0}
 .clist li span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .empty{color:var(--tx3);font-size:12.5px;padding:10px 2px}
+.feed{max-height:330px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;background:#101a35;-webkit-overflow-scrolling:touch}
+.frow{display:grid;grid-template-columns:96px 1fr auto;gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid rgba(38,50,92,.4);font-size:12.5px}
+.frow:last-child{border-bottom:0}
+.fts{color:var(--tx3);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+.fteam{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fchg{color:var(--tx2);white-space:nowrap;font-variant-numeric:tabular-nums}
 footer{color:var(--tx3);font-size:11.5px;text-align:center;line-height:1.7}
 footer a{color:var(--acc);text-decoration:none}
 @media (max-width:560px){
@@ -121,6 +127,14 @@ footer a{color:var(--acc);text-decoration:none}
     <div class="chart-wrap"><svg id="chart" viewBox="0 0 900 380" preserveAspectRatio="xMidYMid meet" role="img" aria-label="名次走势图"></svg></div>
     <div class="legend" id="legend"></div>
     <div class="empty" id="chart-empty" style="display:none"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>实时变动流</h2>
+      <div class="hint">每次抓取与上一次的差异，精确到秒 · 数据实时更新时最能看出谁在超车</div>
+    </div>
+    <div class="feed" id="feed"></div>
   </section>
 
   <section class="panel">
@@ -408,6 +422,34 @@ footer a{color:var(--acc);text-decoration:none}
       block('新进榜 / 首次出现', nw, function(t){ return '<span class="warn">第'+t.rank+'名</span>'; });
   }
 
+  /* ---------------- 实时变动流 ---------------- */
+  function renderFeed(){
+    var el = document.getElementById('feed');
+    var f = D.feed || [];
+    if(!f.length){
+      el.innerHTML = '<div class="empty" style="padding:12px">还没有变动记录。每次抓取都会和上一次对比，有名次或分数变化才会记录一条。</div>';
+      return;
+    }
+    el.innerHTML = f.map(function(e){
+      var ts = (e.ts || '').slice(5, 19);          // MM-DD HH:MM:SS
+      var chg;
+      if(e.kind === 'new'){
+        chg = '<span class="badge n">NEW</span> 第 ' + e.rank + ' 名';
+      } else if(e.kind === 'move'){
+        var d = (e.from_rank || 0) - (e.to_rank || 0);
+        chg = '<span class="badge ' + (d > 0 ? 'u' : 'd') + '">' + (d > 0 ? '▲' + d : '▼' + Math.abs(d)) +
+              '</span> 第 ' + e.from_rank + ' → <b>' + e.to_rank + '</b> 名';
+      } else {
+        var sd = (e.to_score || 0) - (e.from_score || 0);
+        chg = '<span class="' + (sd > 0 ? 'up' : 'down') + '">' + (sd > 0 ? '+' : '') + sd.toFixed(4) +
+              '</span> → ' + Number(e.to_score).toFixed(4);
+      }
+      return '<div class="frow"><span class="fts">' + esc(ts) + '</span>' +
+             '<span class="fteam" title="' + esc(e.csbh) + '">' + esc(e.team) + '</span>' +
+             '<span class="fchg">' + chg + '</span></div>';
+    }).join('');
+  }
+
   document.getElementById('q').addEventListener('input', renderTable);
   document.getElementById('sort').addEventListener('change', renderTable);
   document.getElementById('onlymove').addEventListener('change', renderTable);
@@ -421,7 +463,7 @@ footer a{color:var(--acc);text-decoration:none}
   D.teams.slice().sort(function(a,b){return a.rank-b.rank;}).slice(0,5).forEach(function(t){
     selected.push(t.csbh); ensureColor(t.csbh);
   });
-  renderChart(); renderTable(); renderChanges();
+  renderChart(); renderTable(); renderChanges(); renderFeed();
 })();
 </script>
 </body>

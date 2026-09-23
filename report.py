@@ -123,6 +123,28 @@ def write_csv(outdir, stage, hours, teams):
     return exp
 
 
+def load_feed(outdir, limit=80, days=2):
+    """读取变动流水（jsonl），按时间倒序返回最近 limit 条"""
+    entries = []
+    feed_dir = os.path.join(outdir, "data", "changes")
+    files = sorted(glob.glob(os.path.join(feed_dir, "*.jsonl")))[-days:]
+    for p in files:
+        try:
+            with open(p, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        entries.append(json.loads(line))
+                    except Exception:  # noqa: BLE001
+                        pass
+        except Exception:  # noqa: BLE001
+            pass
+    entries.sort(key=lambda e: e.get("ts", ""))
+    return list(reversed(entries))[:limit]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--snapdir", default=None)
@@ -153,6 +175,7 @@ def main():
         "next_run": nxt.strftime("%m-%d %H:00"),
         "hours": hours,
         "has_prev": len(hours) > 1,
+        "feed": load_feed(outdir),
         "teams": teams,
         "stats": stats,
     }

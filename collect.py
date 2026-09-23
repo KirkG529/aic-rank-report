@@ -165,12 +165,47 @@ def main():
         json.dump(snap, f, ensure_ascii=False)
     os.replace(tmp, path)          # 原子替换，避免读到半截文件
 
+    # 变动流水：和上一次抓取对比，把"谁在什么时刻发生了什么变化"追加成 jsonl
+    latest = os.path.join(outdir, "data", "latest.json")
+    prev = None
+    if os.path.exists(latest):
+        try:
+            prev = json.load(open(latest, encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            prev = None
+
     # 最新快照副本，供其它程序快速读取
     os.makedirs(os.path.join(outdir, "data"), exist_ok=True)
-    latest = os.path.join(outdir, "data", "latest.json")
     with open(latest + ".tmp", "w", encoding="utf-8") as f:
         json.dump(snap, f, ensure_ascii=False)
     os.replace(latest + ".tmp", latest)
+
+    if prev:
+        feed_dir = os.path.join(outdir, "data", "changes")
+        os.makedirs(feed_dir, exist_ok=True)
+        feed_path = os.path.join(feed_dir, t.strftime("%Y-%m-%d") + ".jsonl")
+        n = 0
+        with open(feed_path, "a", encoding="utf-8") as f:
+            for stage, rows in snap["stages"].items():
+                old = {r["csbh"]: r for r in (prev.get("stages", {}).get(stage) or [])}
+                for r in rows:
+                    o = old.get(r["csbh"])
+                    rec = None
+                    if o is None:
+                        rec = {"ts": snap["collected_at"], "stage": stage, "kind": "new",
+                               "csbh": r["csbh"], "team": r["team"],
+                               "rank": r["rank"], "score": r["score"]}
+                    elif o.get("rank") != r["rank"] or o.get("score") != r["score"]:
+                        rec = {"ts": snap["collected_at"], "stage": stage,
+                               "kind": "score" if o.get("rank") == r["rank"] else "move",
+                               "csbh": r["csbh"], "team": r["team"],
+                               "from_rank": o.get("rank"), "to_rank": r["rank"],
+                               "from_score": o.get("score"), "to_score": r["score"]}
+                    if rec:
+                        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                        n += 1
+        if n:
+            print("  变动流水 +%d 条 → %s" % (n, os.path.relpath(feed_path, outdir)))
 
     summary = " ".join("%s=%d" % (k, v) for k, v in snap["totals"].items())
     print("[%s] 快照已保存 %s | %s" % (snap["collected_at"], os.path.relpath(path, outdir), summary))
