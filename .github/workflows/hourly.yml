@@ -56,6 +56,18 @@ jobs:
           PY
           } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: 可选·企业微信推送
+        continue-on-error: true
+        env:
+          WECOM_WEBHOOK: ${{ secrets.WECOM_WEBHOOK }}
+          PAGES_URL: https://kirkg529.github.io/aic-rank-report/
+        run: |
+          if [ -z "$WECOM_WEBHOOK" ]; then
+            echo "未配置 WECOM_WEBHOOK，跳过推送"
+            exit 0
+          fi
+          python3 notify_wecom.py --outdir .
+
       - name: 可选·同步到腾讯云 COS
         continue-on-error: true
         env:
