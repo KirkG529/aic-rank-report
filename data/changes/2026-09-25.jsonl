@@ -88,3 +88,5 @@
 {"ts": "2026-09-25 01:07:41", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-19515242", "team": "随便起的队", "from_rank": 110, "to_rank": 111, "from_score": 0.4127, "to_score": 0.4127}
 {"ts": "2026-09-25 01:07:41", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-21310358", "team": "啊对对队", "from_rank": 111, "to_rank": 112, "from_score": 0.1149, "to_score": 0.1149}
 {"ts": "2026-09-25 01:07:41", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-80140736", "team": "大橘喵喵喵喵喵", "from_rank": 112, "to_rank": 113, "from_score": 0.0, "to_score": 0.0}
+{"ts": "2026-09-25 02:23:50", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-16052243", "team": "Paranoid Ringo", "from_rank": 84, "to_rank": 83, "from_score": 0.7118, "to_score": 0.7144}
+{"ts": "2026-09-25 02:23:50", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-99051558", "team": "自定义名称", "from_rank": 83, "to_rank": 84, "from_score": 0.7123, "to_score": 0.7123}
