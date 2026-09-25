@@ -249,3 +249,5 @@
 {"ts": "2026-09-25 12:54:01", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-19515242", "team": "随便起的队", "from_rank": 113, "to_rank": 115, "from_score": 0.4127, "to_score": 0.4127}
 {"ts": "2026-09-25 12:54:01", "stage": "复赛", "kind": "new", "csbh": "AIC-2026-27576146", "team": "尽力而为", "rank": 116, "score": 0.1304}
 {"ts": "2026-09-25 12:54:01", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-80140736", "team": "大橘喵喵喵喵喵", "from_rank": 114, "to_rank": 117, "from_score": 0.0, "to_score": 0.0}
+{"ts": "2026-09-25 13:06:59", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-76753284", "team": "Neuron", "from_rank": 7, "to_rank": 6, "from_score": 0.82, "to_score": 0.8214}
+{"ts": "2026-09-25 13:06:59", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-14355925", "team": "对不对不队", "from_rank": 6, "to_rank": 7, "from_score": 0.8202, "to_score": 0.8202}
