@@ -54,3 +54,4 @@
 {"ts": "2026-09-26 10:00:00", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-86097561", "team": "粥里无", "from_rank": 116, "to_rank": 117, "from_score": 0.477, "to_score": 0.477}
 {"ts": "2026-09-26 10:00:00", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-60184587", "team": "cc队", "from_rank": 117, "to_rank": 118, "from_score": 0.4677, "to_score": 0.4677}
 {"ts": "2026-09-26 10:00:00", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-30530997", "team": "稳定性", "from_rank": 118, "to_rank": 119, "from_score": 0.4376, "to_score": 0.4376}
+{"ts": "2026-09-26 10:10:26", "stage": "复赛", "kind": "score", "csbh": "AIC-2026-64786820", "team": "让我看看", "from_rank": 94, "to_rank": 94, "from_score": 0.6982, "to_score": 0.6989}
