@@ -207,3 +207,16 @@
 {"ts": "2026-10-02 13:53:58", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-83825128", "team": "可以可以", "from_rank": 127, "to_rank": 128, "from_score": 0.6541, "to_score": 0.6541}
 {"ts": "2026-10-02 13:53:58", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-98573645", "team": "猪猪侠", "from_rank": 128, "to_rank": 129, "from_score": 0.6473, "to_score": 0.6473}
 {"ts": "2026-10-02 13:53:58", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-37785665", "team": "哦对的对的不对不队", "from_rank": 129, "to_rank": 130, "from_score": 0.6434, "to_score": 0.6434}
+{"ts": "2026-10-02 15:28:40", "stage": "复赛", "kind": "score", "csbh": "AIC-2026-22547732", "team": "BLG星际魅镞", "from_rank": 53, "to_rank": 53, "from_score": 0.7891, "to_score": 0.7893}
+{"ts": "2026-10-02 15:28:40", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-13229266", "team": "观衍队", "from_rank": 141, "to_rank": 138, "from_score": 0.5453, "to_score": 0.5784}
+{"ts": "2026-10-02 15:28:40", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-43047914", "team": "多孜然不要辣", "from_rank": 138, "to_rank": 139, "from_score": 0.575, "to_score": 0.575}
+{"ts": "2026-10-02 15:28:40", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-77900077", "team": "win", "from_rank": 139, "to_rank": 140, "from_score": 0.5585, "to_score": 0.5585}
+{"ts": "2026-10-02 15:28:40", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-83240357", "team": "715队", "from_rank": 140, "to_rank": 141, "from_score": 0.5547, "to_score": 0.5547}
+{"ts": "2026-10-02 15:28:40", "stage": "复赛", "kind": "new", "csbh": "AIC-2026-65871506", "team": "专眼", "rank": 142, "score": 0.5538}
+{"ts": "2026-10-02 15:28:40", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-96594847", "team": "财源滚滚队", "from_rank": 142, "to_rank": 143, "from_score": 0.5165, "to_score": 0.5165}
+{"ts": "2026-10-02 15:28:40", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-40041403", "team": "Mamba", "from_rank": 143, "to_rank": 144, "from_score": 0.5114, "to_score": 0.5114}
+{"ts": "2026-10-02 15:28:40", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-39568572", "team": "摘星", "from_rank": 144, "to_rank": 145, "from_score": 0.5079, "to_score": 0.5079}
+{"ts": "2026-10-02 15:28:40", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-30530997", "team": "稳定性", "from_rank": 145, "to_rank": 146, "from_score": 0.5079, "to_score": 0.5079}
+{"ts": "2026-10-02 15:28:40", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-81848337", "team": "想不出队名", "from_rank": 146, "to_rank": 147, "from_score": 0.4921, "to_score": 0.4921}
+{"ts": "2026-10-02 15:28:40", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-19515242", "team": "随便起的队", "from_rank": 147, "to_rank": 148, "from_score": 0.4724, "to_score": 0.4724}
+{"ts": "2026-10-02 15:28:40", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-13051658", "team": "智源求索队", "from_rank": 148, "to_rank": 149, "from_score": 0.0443, "to_score": 0.0443}
