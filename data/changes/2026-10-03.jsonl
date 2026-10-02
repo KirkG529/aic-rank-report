@@ -81,3 +81,4 @@
 {"ts": "2026-10-03 03:28:59", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-23851118", "team": "10101", "from_rank": 83, "to_rank": 84, "from_score": 0.7708, "to_score": 0.7708}
 {"ts": "2026-10-03 03:28:59", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-48223699", "team": "云上码术", "from_rank": 84, "to_rank": 85, "from_score": 0.7699, "to_score": 0.7699}
 {"ts": "2026-10-03 03:28:59", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-74577474", "team": "做得对", "from_rank": 85, "to_rank": 86, "from_score": 0.7698, "to_score": 0.7698}
+{"ts": "2026-10-03 04:42:24", "stage": "复赛", "kind": "score", "csbh": "AIC-2026-72687879", "team": "AAA大模型训练王总", "from_rank": 94, "to_rank": 94, "from_score": 0.7638, "to_score": 0.7652}
