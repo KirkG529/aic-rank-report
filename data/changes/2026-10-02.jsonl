@@ -89,3 +89,7 @@
 {"ts": "2026-10-02 09:03:28", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-17184692", "team": "优雅奶蛙", "from_rank": 33, "to_rank": 32, "from_score": 0.8033, "to_score": 0.8046}
 {"ts": "2026-10-02 09:03:28", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-27835555", "team": "豪有道理的队", "from_rank": 32, "to_rank": 33, "from_score": 0.8033, "to_score": 0.8033}
 {"ts": "2026-10-02 09:08:07", "stage": "复赛", "kind": "score", "csbh": "AIC-2026-99051558", "team": "自定义名称", "from_rank": 109, "to_rank": 109, "from_score": 0.738, "to_score": 0.7385}
+{"ts": "2026-10-02 09:40:44", "stage": "复赛", "kind": "score", "csbh": "AIC-2026-99051558", "team": "自定义名称", "from_rank": 109, "to_rank": 109, "from_score": 0.7385, "to_score": 0.7397}
+{"ts": "2026-10-02 09:40:44", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-62177556", "team": "桃园结义队", "from_rank": 124, "to_rank": 122, "from_score": 0.6965, "to_score": 0.7011}
+{"ts": "2026-10-02 09:40:44", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-64786820", "team": "让我看看", "from_rank": 122, "to_rank": 123, "from_score": 0.6989, "to_score": 0.6989}
+{"ts": "2026-10-02 09:40:44", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-53271811", "team": "AGI-dream", "from_rank": 123, "to_rank": 124, "from_score": 0.6968, "to_score": 0.6968}
