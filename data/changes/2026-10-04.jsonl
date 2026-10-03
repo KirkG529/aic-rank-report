@@ -99,3 +99,6 @@
 {"ts": "2026-10-04 00:44:24", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-13241079", "team": "Judy不去Cindy不来队", "from_rank": 151, "to_rank": 152, "from_score": 0.1337, "to_score": 0.1337}
 {"ts": "2026-10-04 00:44:24", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-13051658", "team": "智源求索队", "from_rank": 152, "to_rank": 153, "from_score": 0.0443, "to_score": 0.0875}
 {"ts": "2026-10-04 00:44:24", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-71216618", "team": "ZS队", "from_rank": 153, "to_rank": 154, "from_score": 0.0049, "to_score": 0.0049}
+{"ts": "2026-10-04 01:14:50", "stage": "复赛", "kind": "score", "csbh": "AIC-2026-14355925", "team": "对不对不队", "from_rank": 2, "to_rank": 2, "from_score": 0.8394, "to_score": 0.8399}
+{"ts": "2026-10-04 01:14:50", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-13051658", "team": "智源求索队", "from_rank": 153, "to_rank": 152, "from_score": 0.0875, "to_score": 0.4842}
+{"ts": "2026-10-04 01:14:50", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-13241079", "team": "Judy不去Cindy不来队", "from_rank": 152, "to_rank": 153, "from_score": 0.1337, "to_score": 0.1337}
