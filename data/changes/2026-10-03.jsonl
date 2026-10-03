@@ -244,3 +244,4 @@
 {"ts": "2026-10-03 15:06:02", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-83701190", "team": "从容应队", "from_rank": 120, "to_rank": 121, "from_score": 0.7069, "to_score": 0.7069}
 {"ts": "2026-10-03 15:06:02", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-50720135", "team": "半路出现", "from_rank": 121, "to_rank": 122, "from_score": 0.7032, "to_score": 0.7032}
 {"ts": "2026-10-03 15:06:02", "stage": "复赛", "kind": "move", "csbh": "AIC-2026-35244001", "team": "MTN收割机", "from_rank": 122, "to_rank": 123, "from_score": 0.7018, "to_score": 0.7018}
+{"ts": "2026-10-03 16:01:08", "stage": "复赛", "kind": "score", "csbh": "AIC-2026-83825128", "team": "可以可以", "from_rank": 130, "to_rank": 130, "from_score": 0.6547, "to_score": 0.6566}
