@@ -34,8 +34,29 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: 验证赛段切换逻辑
+        run: python3 -m unittest -v test_stages.py
+
       - name: 抓取排行榜快照
-        run: python3 collect.py --outdir .
+        run: python3 collect.py --config ./config.json --outdir .
+
+      - name: 校验当前赛段快照
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          cfg = json.loads(Path("config.json").read_text(encoding="utf-8"))
+          snap = json.loads(Path("data/latest.json").read_text(encoding="utf-8"))
+          if snap.get("errors"):
+              raise SystemExit("排行榜抓取失败：%s" % snap["errors"])
+          if snap.get("page_url") != cfg["page_url"]:
+              raise SystemExit("快照榜单地址与当前配置不一致")
+          for stage in cfg["stages"]:
+              if not snap.get("stages", {}).get(stage):
+                  raise SystemExit("当前赛段没有排行榜数据：%s" % stage)
+              print("%s：%d 队" % (stage, len(snap["stages"][stage])))
+          PY
 
       - name: 生成 Web 报表
         run: python3 report.py --outdir . --snapdir ./data/snapshots --out ./index.html
@@ -45,12 +66,17 @@ jobs:
           {
             echo "### 排行榜快照（北京时间 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')）"
             echo
-            echo "| 排名 | 团队 | 分数 | 提交时间 |"
-            echo "| --- | --- | --- | --- |"
             python3 - <<'PY'
           import json
+          cfg = json.load(open("config.json", encoding="utf-8"))
           d = json.load(open("data/latest.json", encoding="utf-8"))
-          for st, rows in d.get("stages", {}).items():
+          print("当前赛段：%s" % "、".join(cfg["stages"]))
+          print("榜单：%s" % cfg["page_url"])
+          print()
+          print("| 排名 | 团队 | 分数 | 提交时间 |")
+          print("| --- | --- | --- | --- |")
+          for st in cfg["stages"]:
+              rows = d["stages"][st]
               print("| | **%s（共 %d 队）** | | |" % (st, len(rows)))
               for r in rows[:10]:
                   print("| %s | %s | %s | %s |" % (r["rank"], r["team"], r["score"], r["submit"]))
@@ -88,7 +114,7 @@ jobs:
         run: |
           git config user.name  "AIC Rank Bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git add -- data index.html
           if git diff --cached --quiet; then
             echo "没有变化，跳过提交"
             exit 0
