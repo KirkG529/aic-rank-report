@@ -69,6 +69,14 @@ tbody tr.sel{background:#152a52}
 td.rank{font-weight:700}
 td.team{max-width:230px;overflow:hidden;text-overflow:ellipsis}
 td.num{text-align:right}
+.award-note{color:var(--tx2);font-size:12px;line-height:1.8;margin:0 0 12px}
+.award-note strong{color:var(--tx)}
+.award-line{cursor:default}
+.award-line:hover{background:transparent}
+.award-line td{padding:10px 0}
+.award-rule{display:flex;align-items:center;gap:12px;font-size:12px;font-weight:600}
+.award-rule::before,.award-rule::after{content:'';height:0;border-top:2px solid currentColor;flex:1;min-width:24px}
+.award-gold{color:#ffd166}.award-silver{color:#b8c7e0}.award-bronze{color:#e5a77a}
 .badge{display:inline-block;min-width:44px;text-align:center;border-radius:7px;padding:1px 6px;font-size:11.5px;font-weight:600}
 .badge.u{background:rgba(45,212,167,.14);color:var(--up)}
 .badge.d{background:rgba(255,107,129,.14);color:var(--down)}
@@ -152,6 +160,7 @@ footer a{color:var(--acc);text-decoration:none}
         <label class="chk"><input type="checkbox" id="onlymove"> 只看有变化</label>
       </div>
     </div>
+    <div class="award-note" id="award-note"></div>
     <div class="table-wrap">
       <table>
         <thead><tr>
@@ -178,6 +187,23 @@ footer a{color:var(--acc);text-decoration:none}
   var PALETTE = ['#4cc9f0','#ff6b81','#ffd166','#2dd4a7','#c77dff','#ff9f1c','#90be6d','#4dabf7','#f783ac','#ffe066'];
   var selected = [];           // 选中队伍的 csbh
   var colorOf = {};            // csbh -> color
+  var awardTotal = D.teams.length;
+  var awardCuts = [
+    {name:'一等奖', percent:15, end:Math.floor(awardTotal*15/100), cls:'award-gold'},
+    {name:'二等奖', percent:25, end:Math.floor(awardTotal*40/100), cls:'award-silver'},
+    {name:'三等奖', percent:30, end:Math.floor(awardTotal*70/100), cls:'award-bronze'}
+  ];
+  var previousCut = 0;
+  document.getElementById('award-note').innerHTML = '<strong>获奖推算</strong> · 当前榜单共 '+awardTotal+' 支队伍 · '+awardCuts.map(function(a){
+    var count = a.end-previousCut;
+    var range = count ? '第 '+(previousCut+1)+'–'+a.end+' 名' : '暂无名额';
+    previousCut = a.end;
+    return a.name+' '+a.percent+'%（'+range+'，'+count+' 队）';
+  }).join('；')+'。<br>按累计比例 15% / 40% / 70% 向下取整，依据榜单排名划线；同名次不另行扩展名额，仅供参考，最终以官方结果为准。<span id="award-view-hint"></span>';
+
+  function awardLine(a){
+    return '<tr class="award-line '+a.cls+'"><td colspan="9"><div class="award-rule">'+a.name+'推算线 · 截至第 '+a.end+' 名</div></td></tr>';
+  }
 
   function fmtScore(v){ return (v===null||v===undefined) ? '—' : Number(v).toFixed(4); }
   function fmtDelta(v,digits){
@@ -370,7 +396,12 @@ footer a{color:var(--acc);text-decoration:none}
       if(sortKey==='submit') return String(b.submit).localeCompare(String(a.submit));
       return 0;
     });
-    document.getElementById('tbody').innerHTML = rows.map(function(t){
+    var showAwards = sortKey==='rank' && !q && !only;
+    document.getElementById('award-view-hint').textContent = showAwards ? '' : ' 分界线仅在按排名展示完整榜单时显示。';
+    document.getElementById('tbody').innerHTML = rows.map(function(t, i){
+      var lines = showAwards ? awardCuts.filter(function(a){
+        return a.end>0 && t.rank<=a.end && (i===rows.length-1 || rows[i+1].rank>a.end);
+      }).map(awardLine).join('') : '';
       var sel = selected.indexOf(t.csbh)>=0 ? ' class="sel"' : '';
       var sd = (t.score_delta && Math.abs(t.score_delta)>0.00005)
         ? '<span class="'+(t.score_delta>0?'up':'down')+'">'+fmtDelta(t.score_delta,4)+'</span>' : '<span style="color:#65719b">—</span>';
@@ -383,14 +414,14 @@ footer a{color:var(--acc);text-decoration:none}
         '<td class="num">'+sd+'</td>'+
         '<td class="mono">'+esc(t.submit)+'</td>'+
         '<td class="mono">'+esc(t.scored_at)+'</td>'+
-        '<td>'+spark(t)+'</td></tr>';
+        '<td>'+spark(t)+'</td></tr>'+lines;
     }).join('');
     var emptyEl = document.getElementById('tbl-empty');
     emptyEl.style.display = rows.length? 'none':'block';
     emptyEl.textContent = only
       ? (D.has_prev ? '本轮没有名次或分数变化' : '还没有可对比的历史快照（至少需要 2 个整点快照）')
       : '没有匹配的队伍';
-    Array.prototype.forEach.call(document.querySelectorAll('#tbody tr'), function(tr){
+    Array.prototype.forEach.call(document.querySelectorAll('#tbody tr[data-csbh]'), function(tr){
       tr.addEventListener('click', function(){ toggle(tr.getAttribute('data-csbh')); });
     });
   }
