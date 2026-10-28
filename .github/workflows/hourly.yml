@@ -43,7 +43,7 @@ jobs:
       - name: 写入运行摘要
         run: |
           {
-            echo "### 复赛排名快照（北京时间 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')）"
+            echo "### 排行榜快照（北京时间 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')）"
             echo
             echo "| 排名 | 团队 | 分数 | 提交时间 |"
             echo "| --- | --- | --- | --- |"

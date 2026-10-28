@@ -43,6 +43,7 @@ def load_snapshots(snapdir):
 
 
 def build_model(snaps, stage):
+    snaps = [s for s in snaps if stage in s.get("stages", {})]
     hours = [s["hour"] for s in snaps]
     hist = {}      # csbh -> {team, points:{hour: (rank, score)}, submit, scored_at}
     order = []
@@ -123,7 +124,7 @@ def write_csv(outdir, stage, hours, teams):
     return exp
 
 
-def load_feed(outdir, limit=80, days=2):
+def load_feed(outdir, limit=80, days=2, stage=None):
     """读取变动流水（jsonl），按时间倒序返回最近 limit 条"""
     entries = []
     feed_dir = os.path.join(outdir, "data", "changes")
@@ -136,7 +137,9 @@ def load_feed(outdir, limit=80, days=2):
                     if not line:
                         continue
                     try:
-                        entries.append(json.loads(line))
+                        entry = json.loads(line)
+                        if stage is None or entry.get("stage") == stage:
+                            entries.append(entry)
                     except Exception:  # noqa: BLE001
                         pass
         except Exception:  # noqa: BLE001
@@ -175,7 +178,7 @@ def main():
         "next_run": nxt.strftime("%m-%d %H:00"),
         "hours": hours,
         "has_prev": len(hours) > 1,
-        "feed": load_feed(outdir),
+        "feed": load_feed(outdir, stage=stage),
         "teams": teams,
         "stats": stats,
     }

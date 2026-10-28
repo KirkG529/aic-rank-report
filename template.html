@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>AIC 复赛排名实时报表</title>
+<title>AIC 半决赛排名实时报表</title>
 <style>
 :root{
   --bg:#0b1020; --bg2:#121a33; --card:#161f3d; --card2:#1c2749;
@@ -106,8 +106,8 @@ footer a{color:var(--acc);text-decoration:none}
     <div class="brand">
       <div class="logo">AIC</div>
       <div>
-        <h1 id="hd-title">复赛排名实时报表</h1>
-        <p class="sub" id="hd-sub">基于大模型的多模态视觉理解与推理 · 复赛</p>
+        <h1 id="hd-title">半决赛排名实时报表</h1>
+        <p class="sub" id="hd-sub">基于大模型的多模态视觉理解与推理 · 半决赛</p>
       </div>
     </div>
     <div class="meta">
@@ -189,6 +189,7 @@ footer a{color:var(--acc);text-decoration:none}
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
   /* ---------------- header + cards ---------------- */
+  document.title = 'AIC ' + D.stage + '排名实时报表';
   document.getElementById('hd-title').textContent = D.stage + '排名实时报表';
   document.getElementById('hd-sub').textContent = D.title + ' · ' + D.stage;
   document.getElementById('hd-time').textContent = D.generated_at;

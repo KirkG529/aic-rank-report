@@ -41,7 +41,7 @@ def post_json(url, payload, timeout=20):
         return json.loads(r.read().decode("utf-8", "replace"))
 
 
-def build_message(hours, teams, stats, url, max_items=5):
+def build_message(hours, teams, stats, url, max_items=5, stage="半决赛"):
     """生成企业微信 markdown 消息（内容上限 4096 字节）"""
     cur = hours[-1]
     prev = hours[-2]
@@ -54,7 +54,7 @@ def build_message(hours, teams, stats, url, max_items=5):
     new = [t for t in teams if t["rank_delta"] is None]
 
     L = []
-    L.append("**AIC 复赛排名变化** <font color=\"comment\">%s</font>" % cur[5:])
+    L.append("**AIC %s排名变化** <font color=\"comment\">%s</font>" % (stage, cur[5:]))
     L.append("> 共 **%d** 支队 · 本轮 **%d** 支名次变动%s"
              % (stats["total"], stats["moved"],
                 ("、**%d** 支新进榜" % len(new)) if new else ""))
@@ -116,13 +116,13 @@ def main():
         return 0 if r.get("errcode") == 0 else 1
 
     snapdir = os.path.join(outdir, "data", "snapshots")
-    snaps = load_snapshots(snapdir)
+    snaps = [s for s in load_snapshots(snapdir) if stage in s.get("stages", {})]
     if len(snaps) < 2:
         print("快照不足 2 个，跳过推送")
         return 0
 
     hours, teams, stats = build_model(snaps, stage)
-    msg = build_message(hours, teams, stats, url)
+    msg = build_message(hours, teams, stats, url, stage=stage)
 
     # 去重：同一小时且变化集合相同则不重复推送
     changed = sorted([(t["csbh"], t["rank_delta"], t["score_delta"])
