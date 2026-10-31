@@ -33,3 +33,7 @@
 {"ts": "2026-10-31 00:44:39", "stage": "半决赛", "kind": "score", "csbh": "AIC-2026-48223699", "team": "云上码术", "from_rank": 55, "to_rank": 55, "from_score": 0.8099, "to_score": 0.8116}
 {"ts": "2026-10-31 00:44:39", "stage": "半决赛", "kind": "move", "csbh": "AIC-2026-37172931", "team": "ai炼丹队", "from_rank": 54, "to_rank": 56, "from_score": 0.8106, "to_score": 0.8106}
 {"ts": "2026-10-31 05:10:25", "stage": "半决赛", "kind": "score", "csbh": "AIC-2026-72144299", "team": "汪汪队", "from_rank": 2, "to_rank": 2, "from_score": 0.8816, "to_score": 0.883}
+{"ts": "2026-10-31 09:07:52", "stage": "半决赛", "kind": "move", "csbh": "AIC-2026-70471909", "team": "伽利略略", "from_rank": 24, "to_rank": 21, "from_score": 0.8461, "to_score": 0.8475}
+{"ts": "2026-10-31 09:07:52", "stage": "半决赛", "kind": "move", "csbh": "AIC-2026-27835555", "team": "豪有道理的队", "from_rank": 21, "to_rank": 22, "from_score": 0.8473, "to_score": 0.8473}
+{"ts": "2026-10-31 09:07:52", "stage": "半决赛", "kind": "move", "csbh": "AIC-2026-49314506", "team": "两者皆有可能这就是答案", "from_rank": 22, "to_rank": 23, "from_score": 0.8471, "to_score": 0.8471}
+{"ts": "2026-10-31 09:07:52", "stage": "半决赛", "kind": "move", "csbh": "AIC-2026-94088437", "team": "壮志凌云队", "from_rank": 23, "to_rank": 24, "from_score": 0.8464, "to_score": 0.8464}
