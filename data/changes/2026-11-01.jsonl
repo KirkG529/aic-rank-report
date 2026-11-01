@@ -15,3 +15,6 @@
 {"ts": "2026-11-01 01:41:07", "stage": "半决赛", "kind": "move", "csbh": "AIC-2026-37172931", "team": "ai炼丹队", "from_rank": 58, "to_rank": 59, "from_score": 0.8106, "to_score": 0.8106}
 {"ts": "2026-11-01 01:41:07", "stage": "半决赛", "kind": "move", "csbh": "AIC-2026-31880919", "team": "YZU参赛队", "from_rank": 59, "to_rank": 60, "from_score": 0.7992, "to_score": 0.7992}
 {"ts": "2026-11-01 01:41:07", "stage": "半决赛", "kind": "move", "csbh": "AIC-2026-68071404", "team": "NUISTAI", "from_rank": 60, "to_rank": 61, "from_score": 0.7765, "to_score": 0.7765}
+{"ts": "2026-11-01 09:28:13", "stage": "半决赛", "kind": "move", "csbh": "AIC-2026-48453332", "team": "图个明白", "from_rank": 7, "to_rank": 6, "from_score": 0.8633, "to_score": 0.8654}
+{"ts": "2026-11-01 09:28:13", "stage": "半决赛", "kind": "move", "csbh": "AIC-2026-66861075", "team": "沙琪玛", "from_rank": 6, "to_rank": 7, "from_score": 0.8643, "to_score": 0.8643}
+{"ts": "2026-11-01 09:28:13", "stage": "半决赛", "kind": "score", "csbh": "AIC-2026-88097941", "team": "板栗", "from_rank": 16, "to_rank": 16, "from_score": 0.854, "to_score": 0.8543}
